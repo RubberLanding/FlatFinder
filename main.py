@@ -91,9 +91,9 @@ def run_scraper():
         page = context.new_page()
 
         # --- LOOP STRATEGY ---
-        # GitHub Actions runs this script every 5 minutes.
-        # We loop 2 times with a 70-140s sleep to cover the gap.
-        for i in range(2):
+        # GitHub Actions runs this script every 20   minutes.
+        # We loop 9 times with a 70-140s sleep to cover the gap.
+        for i in range(9):
             print(f"--- Check iteration {i+1}/3 ---")
             found_new = check_for_ads(page, seen_ids)
             

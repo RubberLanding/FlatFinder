@@ -6,6 +6,11 @@ on:
     # Runs every 5 mins. Hours 6-22 UTC = 07:00-23:00 (Winter) / 08:00-00:00 (Summer) in Germany
     - cron: '*/5 6-22 * * *'
 
+# PREVENTS OVERLAPS: If a job is still running, the new one waits.
+concurrency:
+  group: wg-bot-group
+  cancel-in-progress: false
+
 permissions:
   contents: write
 
@@ -33,6 +38,7 @@ jobs:
         run: |
           git config --global user.name "WG-Bot"
           git config --global user.email "actions@github.com"
+          git pull --rebase --autostash # Pull latest changes before pushing to avoid conflicts
           git add seen_ads.json
           git commit -m "Update seen ads [skip ci]" || exit 0
           git push
