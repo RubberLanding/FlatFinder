@@ -8,7 +8,7 @@ from bs4 import BeautifulSoup
 import requests
 
 # --- CONFIGURATION ---
-SEARCH_URL = "https://www.wg-gesucht.de/wg-zimmer-in-Koeln.73.0.1.0.html?offer_filter=1&city_id=73&sort_order=0&noDeact=1&dFr=1764586800&categories%5B%5D=0&rent_types%5B%5D=2&sMin=10&rMax=600&wgMnF=2&wgMxT=5&wgAge=25"
+SEARCH_URL = "https://www.wg-gesucht.de/wg-zimmer-in-Koeln.73.0.1.0.html?csrf_token=65bb4395273cedb934d75e5e1f6c0a87b568ae82&offer_filter=1&city_id=73&sort_order=0&noDeact=1&dFr=1764586800&categories%5B%5D=0&rent_types%5B%5D=2&sMin=10&rMax=600&ot%5B%5D=1635&ot%5B%5D=1636&ot%5B%5D=1637&ot%5B%5D=1638&ot%5B%5D=1639&ot%5B%5D=1648&ot%5B%5D=1650&ot%5B%5D=85030&ot%5B%5D=1665&ot%5B%5D=1668&ot%5B%5D=1669&ot%5B%5D=1673&ot%5B%5D=1682&ot%5B%5D=1684&ot%5B%5D=1686&ot%5B%5D=1687&ot%5B%5D=1689&ot%5B%5D=1690&ot%5B%5D=1695&ot%5B%5D=1696&ot%5B%5D=1704&ot%5B%5D=1719&wgMnF=2&wgMxT=5&wgAge=25"
 SEEN_FILENAME = "seen_ads.json"
 
 # --- TELEGRAM CONFIGURATION ---
