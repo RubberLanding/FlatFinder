@@ -1,0 +1,32 @@
+name: Daily Scraper
+
+on:
+  workflow_dispatch:      # Allows you to click a "Run" button manually
+  schedule:
+    - cron: '0 8 * * *'   # Runs automatically every day at 8:00 AM UTC
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out this repo
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          playwright install chromium
+
+      - name: Run the scraper
+        run: python main.py
+
+      - name: Save results (Artifacts)
+        uses: actions/upload-artifact@v4
+        with:
+          name: scraper-results
+          path: results.txt  # Must match the filename saved in your script
