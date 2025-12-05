@@ -1,16 +1,19 @@
-name: Daily Scraper
+name: WG Gesucht Bot
 
 on:
-  workflow_dispatch:      # Allows you to click a "Run" button manually
+  workflow_dispatch:
   schedule:
-    - cron: '0 8 * * *'   # Runs automatically every day at 8:00 AM UTC
+    - cron: '*/5 * * * *'   # Runs every 5 minutes
+
+permissions:
+  contents: write
 
 jobs:
   scrape:
     runs-on: ubuntu-latest
     steps:
-      - name: Check out this repo
-        uses: actions/checkout@v3
+      - name: Check out repo
+        uses: actions/checkout@v4
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -22,11 +25,13 @@ jobs:
           pip install -r requirements.txt
           playwright install chromium
 
-      - name: Run the scraper
+      - name: Run Scraper
         run: python main.py
 
-      - name: Save results (Artifacts)
-        uses: actions/upload-artifact@v4
-        with:
-          name: scraper-results
-          path: results.txt  # Must match the filename saved in your script
+      - name: Commit and push memory
+        run: |
+          git config --global user.name "WG-Bot"
+          git config --global user.email "actions@github.com"
+          git add seen_ads.json
+          git commit -m "Update seen ads [skip ci]" || exit 0
+          git push
