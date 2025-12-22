@@ -7,6 +7,10 @@ from playwright.sync_api import sync_playwright
 from bs4 import BeautifulSoup
 import requests
 
+# Debug prints (Remove after fixing!)
+print(f"DEBUG: Token length: {len(TELEGRAM_BOT_TOKEN) if TELEGRAM_BOT_TOKEN else 'None'}")
+print(f"DEBUG: Chat ID: {TELEGRAM_CHAT_ID}")
+
 # --- CONFIGURATION ---
 SEARCH_URL = "https://www.wg-gesucht.de/wg-zimmer-in-Koeln.73.0.1.0.html?csrf_token=65bb4395273cedb934d75e5e1f6c0a87b568ae82&offer_filter=1&city_id=73&sort_order=0&noDeact=1&dFr=1764586800&categories%5B%5D=0&rent_types%5B%5D=2&sMin=10&rMax=600&ot%5B%5D=1635&ot%5B%5D=1636&ot%5B%5D=1637&ot%5B%5D=1638&ot%5B%5D=1639&ot%5B%5D=1648&ot%5B%5D=1650&ot%5B%5D=85030&ot%5B%5D=1665&ot%5B%5D=1668&ot%5B%5D=1669&ot%5B%5D=1673&ot%5B%5D=1682&ot%5B%5D=1684&ot%5B%5D=1686&ot%5B%5D=1687&ot%5B%5D=1689&ot%5B%5D=1690&ot%5B%5D=1695&ot%5B%5D=1696&ot%5B%5D=1704&ot%5B%5D=1719&wgMnF=2&wgMxT=5&wgAge=25"
 SEEN_FILENAME = "seen_ads.json"
@@ -37,10 +41,15 @@ def send_telegram(text):
     url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
     payload = {"chat_id": TELEGRAM_CHAT_ID, "text": text}
     try:
-        requests.post(url, json=payload)
-    except Exception as e:
-        print(f"Failed to send Telegram message: {e}")
-
+        response = requests.post(url, json=payload)
+        # Check for HTTP errors (4xx, 5xx)
+        response.raise_for_status() 
+    except requests.exceptions.RequestException as e:
+        print(f"❌ Failed to send Telegram message: {e}")
+        # PRINT THE ACTUAL RESPONSE FROM TELEGRAM
+        if 'response' in locals(): 
+            print(f"Telegram API Response: {response.text}")
+            
 def check_for_ads(page, seen_ids):
     print(f"Loading page...")
     try:
@@ -95,9 +104,11 @@ def run_scraper():
         page = context.new_page()
 
         # --- LOOP STRATEGY ---
-        # GitHub Actions runs this script every 20   minutes.
+        # GitHub Actions runs this script every 20 minutes.
         # We loop 9 times with a 70-140s sleep to cover the gap.
-        for i in range(9):
+
+        n_iter = 9
+        for i in range(n_iter):
             print(f"--- Check iteration {i+1}/3 ---")
             found_new = check_for_ads(page, seen_ids)
             
@@ -105,7 +116,7 @@ def run_scraper():
                 ids_changed_total = True
                 save_seen_ids(seen_ids) # Save immediately so we don't lose data if crash
             
-            if i < 1: # Don't sleep after the last check
+            if i < n_iter: # Don't sleep after the last check
                 sleep_sec = random.randint(70, 140)
                 print(f"Sleeping {sleep_sec}s before next check...")
                 time.sleep(sleep_sec)
